@@ -1,0 +1,27 @@
+<?php
+/**
+ * Functions for adding the API to the WordPress front end.
+ * @package siPlugg
+ * @since 1.0
+ */
+
+/**
+ * Function that adds the siPlugg api to the DOM.
+ */
+function siplugg_add_api() {
+    $options = get_option(siPLUGG_OPTIONS_NAME, array() );
+    if(array_key_exists('access_code', $options)) {
+ ?>
+<script>
+    (function(ac) {
+      var d = document, s = 'script', id = 'siplugg-adjs';
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = '//<?php echo siPLUGG_ADSERVER; ?>/serve/' + ac + '/js/1.1/ad.js';
+      fjs.parentNode.insertBefore(js, fjs);
+    }('<?php echo $options['access_code']; ?>'));
+</script>
+<?php
+    } //end if
+} //end siplugg_add_api
