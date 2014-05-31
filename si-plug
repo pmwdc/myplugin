@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>SI PLUG</title>
+</head>
+
+<body>
+<?php
+//define constants
+define('siPLUGG_PATH', plugin_dir_path( __FILE__ ));
+define('siPLUGG_BASENAME', plugin_basename(__FILE__));
+
+// Included the optional config.php file
+if(file_exists(siPLUGG_PATH . 'config.php')) {
+    include_once(siPLUGG_PATH . 'config.php');
+}
+
+if(!defined('siPLUGG_ADSERVER')) { define('siPLUGG_ADSERVER', 'www.siplugg.com/apusers'); }
+if(!defined('siPLUGG_VERSION')) { define('siPLUGG_VERSION', '1.1.13'); }
+
+define('siPLUGG_OPTIONS_NAME', 'siplugg_options');
+define('siPLUGG_NOTICES_NAME', 'siplugg_notices');
+define('siPLUGG_WIDGET_OPTIONS_NAME', 'widget_siplugg');
+
+// Register the AdPlugg Widget
+require_once(siPLUGG_PATH . 'widgets/siPlugg_Widget.php');
+add_action('widgets_init', create_function('', 'return register_widget("siPlugg_Widget");'));
+
+if(is_admin()) {
+    //---- ADMIN ----//
+    //includes
+    require_once(siPLUGG_PATH . 'admin/admin-class.php');
+    require_once(siPLUGG_PATH . 'admin/pages/class-options-page.php' );
+    require_once(siPLUGG_PATH . 'admin/help/options-page-help.php' );
+    
+    //Plugin setup and registrations
+    $siplugg_admin = new siPlugg_Admin();
+    register_activation_hook(__FILE__, array('siPlugg_Admin', 'siplugg_activation' ) );
+    register_deactivation_hook(__FILE__, array('siPlugg_Admin', 'siplugg_deactivation'));
+    register_uninstall_hook(__FILE__, array('siPlugg_Admin', 'siplugg_uninstall'));
+    
+    //set up the options page 
+    $siplugg_options_page = new siPlugg_Options_Page();
+    add_filter('contextual_help', 'siplugg_options_page_help', 10, 3);
+
+} else {
+    //---- FRONT END ----//
+    //add the API
+    require_once(siPLUGG_PATH . 'frontend/api.php');
+    add_action('wp_footer', 'siplugg_add_api');
+
+}
+?>
+</body>
+</html>
